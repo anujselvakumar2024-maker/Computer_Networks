@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetProto Emulator - Application Layer Protocol Emulator</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-icon">&#127760;</span>
+            <span class="nav-title">NetProto Emulator</span>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('dashboard')">&#128202; Dashboard</button>
+            <button class="nav-tab" onclick="showTab('protocols')">&#128279; Protocols</button>
+            <button class="nav-tab" onclick="showTab('monitor')">&#128200; Monitor</button>
+        </div>
+    </nav>
+
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
+        <div class="hero-section">
+            <h1 class="hero-title">
+                <span class="gradient-text">Application Layer</span><br>
+                <span class="gradient-text-alt">Protocol Emulator</span>
+            </h1>
+            <p class="hero-subtitle">TCP/IP Application Layer Protocol Demonstration</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="active-connections">0</div>
+                <div class="stat-label">ACTIVE CONNECTIONS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="running-protocols">0</div>
+                <div class="stat-label">RUNNING PROTOCOLS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="data-transferred">0.0 MB</div>
+                <div class="stat-label">DATA TRANSFERRED</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="system-uptime">00:00:00</div>
+                <div class="stat-label">SYSTEM UPTIME</div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>Protocol Usage</h3>
+                <canvas id="protocolChart" width="400" height="300"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Network Traffic</h3>
+                <canvas id="trafficChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="protocol-grid">
+            <div class="protocol-card" data-protocol="HTTP">
+                <div class="protocol-icon">&#128196;</div>
+                <h3>HTTP</h3>
+                <p>Hypertext Transfer Protocol</p>
+                <div class="protocol-controls">
+                    <button class="btn-start" onclick="startProtocol('HTTP')">START SERVER</button>
+                    <div class="status-indicator inactive" id="HTTP-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+
+            <div class="protocol-card" data-protocol="FTP">
+                <div class="protocol-icon">&#128193;</div>
+                <h3>FTP</h3>
+                <p>File Transfer Protocol</p>
+                <div class="protocol-controls">
+                    <button class="btn-start" onclick="startProtocol('FTP')">START SERVER</button>
+                    <div class="status-indicator inactive" id="FTP-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+
+            <div class="protocol-card" data-protocol="SMTP">
+                <div class="protocol-icon">&#128231;</div>
+                <h3>SMTP</h3>
+                <p>Simple Mail Transfer Protocol</p>
+                <div class="protocol-controls">
+                    <button class="btn-start" onclick="startProtocol('SMTP')">START SERVER</button>
+                    <div class="status-indicator inactive" id="SMTP-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+
+            <div class="protocol-card" data-protocol="SNMP">
+                <div class="protocol-icon">&#9881;</div>
+                <h3>SNMP</h3>
+                <p>Simple Network Management Protocol</p>
+                <div class="protocol-controls">
+                    <button class="btn-start" onclick="startProtocol('SNMP')">START SERVER</button>
+                    <div class="status-indicator inactive" id="SNMP-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+
+            <div class="protocol-card" data-protocol="DNS">
+                <div class="protocol-icon">&#127760;</div>
+                <h3>DNS</h3>
+                <p>Domain Name System</p>
+                <div class="protocol-controls">
+                    <button class="btn-start" onclick="startProtocol('DNS')">START SERVER</button>
+                    <div class="status-indicator inactive" id="DNS-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+
+            <div class="protocol-card" data-protocol="Telnet">
+                <div class="protocol-icon">&#128187;</div>
+                <h3>Telnet</h3>
+                <p>Terminal Emulation Protocol</p>
+                <div class="protocol-controls">
+                    <button class="btn-start" onclick="startProtocol('Telnet')">START SERVER</button>
+                    <div class="status-indicator inactive" id="Telnet-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Protocols Tab -->
+    <div id="protocols" class="tab-content">
+        <div class="protocol-detail" id="protocol-detail">
+            <h2>Protocol Emulation</h2>
+            <div class="protocol-tabs">
+                <button class="protocol-tab active" onclick="showProtocol('HTTP')">HTTP</button>
+                <button class="protocol-tab" onclick="showProtocol('FTP')">FTP</button>
+                <button class="protocol-tab" onclick="showProtocol('SMTP')">SMTP</button>
+                <button class="protocol-tab" onclick="showProtocol('SNMP')">SNMP</button>
+                <button class="protocol-tab" onclick="showProtocol('DNS')">DNS</button>
+                <button class="protocol-tab" onclick="showProtocol('Telnet')">Telnet</button>
+            </div>
+
+            <div id="HTTP-protocol" class="protocol-content active">
+                <div class="protocol-header">
+                    <h3>HTTP - Hypertext Transfer Protocol</h3>
+                    <div class="protocol-meta">
+                        <span>Port: 8080</span>
+                        <span class="status-badge inactive" id="HTTP-badge">INACTIVE</span>
+                    </div>
+                </div>
+                <p>The foundation of data communication for the World Wide Web.</p>
+
+                <div class="server-control">
+                    <h4>&#128421; Server Control</h4>
+                    <button class="btn-primary" onclick="startProtocol('HTTP')">START SERVER</button>
+                    <div class="server-status inactive" id="HTTP-server-status">&#8226; Server Offline</div>
+                </div>
+
+                <div class="client-interaction">
+                    <h4>&#128241; Client Interaction</h4>
+                    <div class="input-group">
+                        <input type="text" id="http-request" placeholder="GET /" value="GET /">
+                        <button class="btn-send" onclick="sendHTTPRequest()">SEND</button>
+                    </div>
+                </div>
+
+                <div class="connection-log">
+                    <h4>&#128203; Connection Log</h4>
+                    <div class="log-content" id="HTTP-log">
+                        System initialized. Waiting for connections...
+                    </div>
+                </div>
+            </div>
+
+            <div id="FTP-protocol" class="protocol-content">
+                <div class="protocol-header">
+                    <h3>FTP - File Transfer Protocol</h3>
+                    <div class="protocol-meta">
+                        <span>Port: 2121</span>
+                        <span class="status-badge inactive" id="FTP-badge">INACTIVE</span>
+                    </div>
+                </div>
+                <p>Standard network protocol for file transfer between client and server.</p>
+
+                <div class="server-control">
+                    <h4>&#128421; Server Control</h4>
+                    <button class="btn-primary" onclick="startProtocol('FTP')">START SERVER</button>
+                    <div class="server-status inactive" id="FTP-server-status">&#8226; Server Offline</div>
+                </div>
+
+                <div class="client-interaction">
+                    <h4>&#128241; Client Interaction</h4>
+                    <div class="input-group">
+                        <input type="text" id="ftp-command" placeholder="LIST" value="LIST">
+                        <button class="btn-send" onclick="sendFTPCommand()">SEND</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="SMTP-protocol" class="protocol-content">
+                <div class="protocol-header">
+                    <h3>SMTP - Simple Mail Transfer Protocol</h3>
+                    <div class="protocol-meta">
+                        <span>Port: 2525</span>
+                        <span class="status-badge inactive" id="SMTP-badge">INACTIVE</span>
+                    </div>
+                </div>
+                <p>Internet standard for email transmission.</p>
+
+                <div class="server-control">
+                    <h4>&#128421; Server Control</h4>
+                    <button class="btn-primary" onclick="startProtocol('SMTP')">START SERVER</button>
+                    <div class="server-status inactive" id="SMTP-server-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+
+            <div id="SNMP-protocol" class="protocol-content">
+                <div class="protocol-header">
+                    <h3>SNMP - Simple Network Management Protocol</h3>
+                    <div class="protocol-meta">
+                        <span>Port: 16100</span>
+                        <span class="status-badge inactive" id="SNMP-badge">INACTIVE</span>
+                    </div>
+                </div>
+                <p>Protocol for network management and monitoring.</p>
+
+                <div class="server-control">
+                    <h4>&#128421; Server Control</h4>
+                    <button class="btn-primary" onclick="startProtocol('SNMP')">START SERVER</button>
+                    <div class="server-status inactive" id="SNMP-server-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+
+            <div id="DNS-protocol" class="protocol-content">
+                <div class="protocol-header">
+                    <h3>DNS - Domain Name System</h3>
+                    <div class="protocol-meta">
+                        <span>Port: 53</span>
+                        <span class="status-badge inactive" id="DNS-badge">INACTIVE</span>
+                    </div>
+                </div>
+                <p>Protocol for resolving domain names to IP addresses.</p>
+
+                <div class="server-control">
+                    <h4>&#128421; Server Control</h4>
+                    <button class="btn-primary" onclick="startProtocol('DNS')">START SERVER</button>
+                    <div class="server-status inactive" id="DNS-server-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+
+            <div id="Telnet-protocol" class="protocol-content">
+                <div class="protocol-header">
+                    <h3>Telnet - Terminal Emulation Protocol</h3>
+                    <div class="protocol-meta">
+                        <span>Port: 2323</span>
+                        <span class="status-badge inactive" id="Telnet-badge">INACTIVE</span>
+                    </div>
+                </div>
+                <p>Protocol for remote terminal access.</p>
+
+                <div class="server-control">
+                    <h4>&#128421; Server Control</h4>
+                    <button class="btn-primary" onclick="startProtocol('Telnet')">START SERVER</button>
+                    <div class="server-status inactive" id="Telnet-server-status">&#8226; Server Offline</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monitor Tab -->
+    <div id="monitor" class="tab-content">
+        <h2>Network Monitor</h2>
+        <div class="monitor-grid">
+            <div class="topology-section">
+                <h3>Live Network Topology</h3>
+                <div class="topology-container" id="network-topology">
+                    <div class="network-node" id="dns-node">
+                        <div class="node-label">DNS</div>
+                    </div>
+                    <div class="network-node" id="telnet-node">
+                        <div class="node-label">Telnet</div>
+                    </div>
+                    <div class="network-node" id="snmp-node">
+                        <div class="node-label">SNMP</div>
+                    </div>
+                    <div class="network-node active" id="http-node">
+                        <div class="node-label">HTTP</div>
+                    </div>
+                    <div class="network-node" id="ftp-node">
+                        <div class="node-label">FTP</div>
+                    </div>
+                    <div class="network-node" id="smtp-node">
+                        <div class="node-label">SMTP</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="protocol-status-grid">
+                <h3>Protocol Status Grid</h3>
+                <div class="status-grid" id="status-grid">
+                    <div class="status-item">
+                        <span>HTTP</span>
+                        <span>:8080</span>
+                        <span class="status offline">OFFLINE</span>
+                    </div>
+                    <div class="status-item">
+                        <span>FTP</span>
+                        <span>:2121</span>
+                        <span class="status offline">OFFLINE</span>
+                    </div>
+                    <div class="status-item">
+                        <span>SMTP</span>
+                        <span>:2525</span>
+                        <span class="status offline">OFFLINE</span>
+                    </div>
+                    <div class="status-item">
+                        <span>SNMP</span>
+                        <span>:16100</span>
+                        <span class="status offline">OFFLINE</span>
+                    </div>
+                    <div class="status-item">
+                        <span>DNS</span>
+                        <span>:53</span>
+                        <span class="status offline">OFFLINE</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Telnet</span>
+                        <span>:23</span>
+                        <span class="status offline">OFFLINE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
